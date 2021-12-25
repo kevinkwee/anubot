@@ -164,4 +164,76 @@ const randomQuote = new BotCommand(
     }
 );
 
-module.exports = [ping, randomQuote, exitBot, help];
+const logchat = new BotCommand(
+    'logchat',
+    'buat nyatet chat org yg suka chat apus chat apus',
+    'anu lc <mention>',
+    'lc',
+    (msgData, ws) => {
+        console.log();
+        console.log("[Command detected] [anu logchat]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+        const regex = /\n/g;
+
+        const msgDataSplit = msgData.content.split(" ");
+
+        if (msgDataSplit.length >= 3) {
+            if (msgDataSplit[2].startsWith("<@") && msgDataSplit[2].endsWith(">")) {
+                if (ws.listenerCount("message") > 1) {
+                    utils().sendMessage(guildId, channelId, "*Maksimal satu logger y mz..*");
+                    return;
+                }
+                const targetUid = msgDataSplit[2].slice(2, -1);
+                let lastContent = String.raw`**Catetan chat <@${targetUid}>**`;
+                let lastBotMsgId = "";
+                const msgContent = String.raw`${lastContent}\n> *Blom ngechat*`;
+                utils().sendMessage(guildId, channelId, msgContent).then((response) => {
+                    lastBotMsgId = response.data.id;
+                    function logMsg(data) {
+                        let payload = JSON.parse(data);
+                        const { t, s, op, d } = payload;
+                        if (op == 0 && t == 'MESSAGE_CREATE') {
+                            if (d.author.id == targetUid) {
+                                let newMsgContent = lastContent + String.raw`\n> **[${(new Date(d.timestamp)).toLocaleString()}]**\n> *${(d.content).replace(regex, `\\n`)}*`;
+                                if (newMsgContent.length >= 2000) {
+                                    newMsgContent = String.raw`**Catetan chat <@${targetUid}>**` + String.raw`\n> **[${(new Date(d.timestamp)).toLocaleString()}]**\n> *${(d.content).replace(regex, `\\n`)}*`;
+                                }
+                                utils().sendMessage(guildId, channelId, newMsgContent).then((newResponse) => {
+                                    lastContent = newResponse.data.content.replace(regex, `\\n`);
+                                    utils().deleteMessage(guildId, channelId, lastBotMsgId);
+                                    lastBotMsgId = newResponse.data.id;
+                                });
+                            }
+                        }
+                    }
+                    ws.on('message', logMsg);
+                });
+            }
+        }
+    },
+);
+
+const stoplogchat = new BotCommand(
+    'stoplogchat',
+    'Buat berhentiin log chat',
+    'anu stoplogchat',
+    'slc',
+    (msgData, ws) => {
+        console.log();
+        console.log("[Command detected] [anu stoplogchat]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+
+        if (ws.listenerCount("message") > 1) {
+            ws.removeListener("message", ws.listeners("message")[1]);
+            utils().sendMessage(guildId, channelId, "*Logchat uda kustop yaa..*");
+        } else {
+            utils().sendMessage(guildId, channelId, "*Ndak ada logchat yg jalan mz..*");
+        }
+    }
+);
+
+module.exports = [ping, randomQuote, logchat, stoplogchat, exitBot, help];
