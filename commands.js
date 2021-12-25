@@ -191,11 +191,11 @@ const logchat = new BotCommand(
                 const msgContent = String.raw`${lastContent}\n> *Blom ngechat*`;
                 utils().sendMessage(guildId, channelId, msgContent).then((response) => {
                     lastBotMsgId = response.data.id;
-                    function logMsg(data) {
+                    const logMsg = (data) => {
                         let payload = JSON.parse(data);
                         const { t, s, op, d } = payload;
                         if (op == 0 && t == 'MESSAGE_CREATE') {
-                            if (d.author.id == targetUid) {
+                            if (d.author.id == targetUid || `!` + d.author.id == targetUid) {
                                 let newMsgContent = lastContent + String.raw`\n> **[${(new Date(d.timestamp)).toLocaleString()}]**\n> *${(d.content).replace(regex, `\\n`)}*`;
                                 if (newMsgContent.length >= 2000) {
                                     newMsgContent = String.raw`**Catetan chat <@${targetUid}>**` + String.raw`\n> **[${(new Date(d.timestamp)).toLocaleString()}]**\n> *${(d.content).replace(regex, `\\n`)}*`;
