@@ -39,14 +39,19 @@ const exitBot = new BotCommand(
 
         console.log();
         console.log("[Command detected] [anu exit]");
-        console.log("Sending bye-bye message...");
-        utils().sendMessage(guildId, channelId, "> **Aku pamit yaa**\\n> **Dadaaahhh... :wave:**").then(() => {
-            utils().editServerNick(guildId, process.env.OFFLINE_NICK).then(() => {
-                console.log("Closing websocket...");
-                ws.close();
-                exit(0);
+        if (msgData.author.id == '545945146051526656') {
+            console.log("Sending bye-bye message...");
+            utils().sendMessage(guildId, channelId, "> **Aku pamit yaa**\\n> **Dadaaahhh... :wave:**").then(() => {
+                utils().editServerNick(guildId, process.env.OFFLINE_NICK).then(() => {
+                    console.log("Closing websocket...");
+                    ws.close();
+                    exit(0);
+                });
             });
-        });
+        } else {
+            console.log("Cannot exit! Command wasn't sent by anu.");
+            utils().sendMessage(guildId, channelId, "*Command exit cuma <@545945146051526656> yg bisa pake..*");
+        }
     },
 );
 
