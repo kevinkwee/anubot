@@ -1,4 +1,7 @@
 let fetch;
+const crypto = require('crypto');
+const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
+const { Blob, FormData } = require('formdata-node');
 
 import('node-fetch').then((module) => {
     fetch = module.default;
@@ -9,8 +12,17 @@ module.exports = {
     deleteMessage: deleteMessage,
     editMessage: editMessage,
     sendMessage: sendMessage,
+    sendImage: sendImage,
     getCurrentTimeStr: getCurrentTimeStr,
-    getRandomQuote: getRandomQuote
+    getRandomQuote: getRandomQuote,
+    checkIsMsgMentioning: checkIsMsgMentioning,
+    getUser: getUser,
+    getMentionedUser: getMentionedUser,
+    sendPhotoTask: sendPhotoTask,
+    getPhotoResult: getPhotoResult,
+    fetchImageBlob: fetchImageBlob,
+    parseXml: parseXml,
+    buildXml: buildXml
 }
 
 function getCurrentTimeStr() {
@@ -28,7 +40,7 @@ function editServerNick(guildId, nick) {
                     "Accept": "*/*",
                     "Accept-Language": "en-US,en;q=0.5",
                     "Content-Type": "application/json",
-                    "Authorization": "OTIxMzcxMzM3NDc2NDI3ODM2.Ybx9Ag.aeksutojF1EruNF4XAmnIasN6hk",
+                    "Authorization": process.env.TOKEN,
                     "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4NDcxLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
                     "X-Discord-Locale": "en-US",
                     "X-Debug-Options": "bugReporterEnabled",
@@ -69,7 +81,7 @@ function deleteMessage(guildId, channelId, messageId) {
                     "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
                     "Accept": "*/*",
                     "Accept-Language": "en-US,en;q=0.5",
-                    "Authorization": "OTIxMzcxMzM3NDc2NDI3ODM2.Ybx9Ag.aeksutojF1EruNF4XAmnIasN6hk",
+                    "Authorization": process.env.TOKEN,
                     "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4NDcxLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
                     "X-Discord-Locale": "en-US",
                     "X-Debug-Options": "bugReporterEnabled",
@@ -113,7 +125,7 @@ function editMessage(guildId, channelId, messageId, content, embeds = []) {
                     "Accept": "*/*",
                     "Accept-Language": "en-US,en;q=0.5",
                     "Content-Type": "application/json",
-                    "Authorization": "OTIxMzcxMzM3NDc2NDI3ODM2.Ybx9Ag.aeksutojF1EruNF4XAmnIasN6hk",
+                    "Authorization": process.env.TOKEN,
                     "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4NDcxLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
                     "X-Discord-Locale": "en-US",
                     "X-Debug-Options": "bugReporterEnabled",
@@ -159,7 +171,7 @@ function sendMessage(guildId, channelId, content, embeds = []) {
                     "Accept": "*/*",
                     "Accept-Language": "en-US,en;q=0.5",
                     "Content-Type": "application/json",
-                    "Authorization": "OTIxMzcxMzM3NDc2NDI3ODM2.Ybx9Ag.aeksutojF1EruNF4XAmnIasN6hk",
+                    "Authorization": process.env.TOKEN,
                     "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4NDcxLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
                     "X-Discord-Locale": "en-US",
                     "X-Debug-Options": "bugReporterEnabled",
@@ -195,6 +207,51 @@ function sendMessage(guildId, channelId, content, embeds = []) {
     });
 }
 
+function sendImage(guildId, channelId, blob, filename) {
+    return new Promise(async (resolve, reject) => {
+        console.log("Sending image...");
+        const formData = new FormData();
+        formData.set('files[0]', blob, filename);
+        formData.set('payload_json', '{"content":"","type":0,"attachments":[{"id":"0","filename":"' + filename + '"}]}');
+        
+        try {
+            let response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages", {
+                "credentials": "include",
+                "headers": {
+                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
+                    "Accept": "*/*",
+                    "Accept-Language": "en-US,en;q=0.5",
+                    "Authorization": process.env.TOKEN,
+                    "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4NDcxLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
+                    "X-Discord-Locale": "en-US",
+                    "X-Debug-Options": "bugReporterEnabled",
+                    "Alt-Used": "discord.com",
+                    "Sec-Fetch-Dest": "empty",
+                    "Sec-Fetch-Mode": "cors",
+                    "Sec-Fetch-Site": "same-origin"
+                },
+                "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
+                "body": formData,
+                "method": "POST",
+                "mode": "cors"
+            });
+
+            if (response.status == 200) {
+                console.log("Image sent.");
+                const responseJson = await response.json();
+                resolve({
+                    status: response.status,
+                    data: responseJson,
+                });
+            } else {
+                console.log("Failed to send an image. " + response.status);
+            }
+        } catch (error) {
+            console.log("Error when sending an image.");
+        }
+    });
+}
+
 function getRandomQuote() {
     return new Promise(async (resolve, reject) => {
         console.log("Getting random quote...");
@@ -207,7 +264,7 @@ function getRandomQuote() {
                     resolve(data);
                     break;
                 } else {
-                    console.log("Getting random quote failed. Retrying...");
+                    console.log("Getting random quote failed. " + response.status);
                 }
             }
         } catch (error) {
@@ -216,4 +273,141 @@ function getRandomQuote() {
             reject("Error when connecting to the API. :sob: ");
         }
     });
+}
+
+function checkIsMsgMentioning(msgData) {
+    const msgDataSplit = msgData.content.split(" ");
+    if (msgDataSplit.length >= 3) {
+        if (msgDataSplit[2].startsWith("<@") && msgDataSplit[2].endsWith(">")) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getMentionedUser(msgData) {
+    const msgDataSplit = msgData.content.split(" ");
+    const mentionedUserId = msgDataSplit[2].slice(2, -1).replace(`!`, '');
+    return mentionedUserId;
+}
+
+function getUser(id) {
+    return new Promise(async (resolve) => {
+        console.log("Getting user data...");
+        try {
+            const response = await fetch("https://discord.com/api/v9/users/" + id, {
+                "credentials": "include",
+                "headers": {
+                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
+                    "Accept": "*/*",
+                    "Accept-Language": "en-US,en;q=0.5",
+                    "Authorization": process.env.TOKEN,
+                    "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4OTI0LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
+                    "X-Discord-Locale": "en-US",
+                    "X-Debug-Options": "bugReporterEnabled",
+                    "Alt-Used": "discord.com",
+                    "Sec-Fetch-Dest": "empty",
+                    "Sec-Fetch-Mode": "no-cors",
+                    "Sec-Fetch-Site": "same-origin",
+                    "Pragma": "no-cache",
+                    "Cache-Control": "no-cache"
+                },
+                "method": "GET",
+                "mode": "cors"
+            });
+
+            if (response.status == 200) {
+                console.log("Getting user data success.");
+                const responseJson = await response.json();
+                resolve({
+                    status: response.status,
+                    data: responseJson,
+                });
+            } else {
+                console.log("Failed to get user data. " + response.status);
+            }
+        } catch (error) {
+            console.log("Error when getting user data.");
+        }
+    });
+}
+
+function sendPhotoTask(data) {
+    return new Promise(async (resolve) => {
+        const signData = crypto.createHmac('sha1', process.env.PHOTO_API_KEY).update(data).digest('hex');
+        console.log("Sending pho.to task...");
+        try {
+            const response = await fetch("https://opeapi.ws.pho.to/addtask", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "app_id=" + process.env.PHOTO_API_APPID + "&sign_data=" + signData + "&data=" + data,
+            });
+
+            if (response.status == 200) {
+                console.log("Sending pho.to task sucess");
+                const responseText = await response.text();
+                resolve({
+                    status: response.status,
+                    data: responseText
+                });
+            } else {
+                console.log("Failed to send pho.to task. " + response.status);
+            }
+        } catch (error) {
+            console.log("Error when sending pho.to task.");
+        }
+    });
+}
+
+function getPhotoResult(requestId) {
+    return new Promise(async (resolve) => {
+        console.log("Getting pho.to result...");
+        try {
+            const response = await fetch("https://opeapi.ws.pho.to/getresult?request_id=" + requestId);
+            if (response.status == 200) {
+                console.log("Getting pho.to result success.");
+                const responseText = await response.text();
+                resolve({
+                    status: response.status,
+                    data: responseText
+                });
+            } else {
+                console.log("Failed to get pho.to result. " + response.status);
+            }
+        } catch (error) {
+            console.log("Error when getting pho.to result.");
+        }
+    });
+}
+
+function fetchImageBlob(url) {
+    return new Promise(async (resolve) => {
+        console.log("Getting the image...");
+        try {
+            const response = await fetch(url);
+            if (response.status == 200) {
+                console.log("Getting the image success.");
+                response.arrayBuffer().then((res) => {
+                    resolve({
+                        status: response.status,
+                        data: new Blob([res], { type: "image/gif" })
+                    });
+                });
+            } else {
+                console.log("Failed to get the image. " + response.status);
+            }
+        } catch (error) {
+            console.log("Error when getting the image.");
+        }
+    });
+}
+
+function parseXml(xml) {
+    return (new XMLParser()).parse(xml);
+}
+
+function buildXml(map) {
+    return (new XMLBuilder()).build(map);
 }
