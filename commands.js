@@ -226,9 +226,9 @@ const logchat = new BotCommand(
                         const { t, s, op, d } = payload;
                         if (op == 0 && t == 'MESSAGE_CREATE') {
                             if (d.author.id == targetUid || `!` + d.author.id == targetUid) {
-                                let newMsgContent = lastContent + String.raw`\n> **<t:${Math.floor((new Date(d.timestamp)).getTime()/1000)}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
+                                let newMsgContent = lastContent + String.raw`\n> **<t:${Math.floor((new Date(d.timestamp)).getTime() / 1000)}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
                                 if (newMsgContent.length >= 2000) {
-                                    newMsgContent = String.raw`**Catetan chat <@${targetUid}>**\n*klo bot ini spam salahin <@${msgData.author.id}>*` + String.raw`\n> **<t:${Math.floor((new Date(d.timestamp)).getTime()/1000)}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
+                                    newMsgContent = String.raw`**Catetan chat <@${targetUid}>**\n*klo bot ini spam salahin <@${msgData.author.id}>*` + String.raw`\n> **<t:${Math.floor((new Date(d.timestamp)).getTime() / 1000)}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
                                 }
                                 utils().sendMessage(guildId, channelId, newMsgContent).then((newResponse) => {
                                     lastContent = newResponse.data.content.replace(regex, `\\n`);
@@ -696,11 +696,19 @@ const nikahin = new BotCommand(
             const target1Id = target1Data.id;
             const target2Id = target2Data.id;
 
-            let target1Name;
-            let target2Name;
+            let target1Name = target1Data.member.nick;
+            let target2Name = target2Data.member.nick;
 
-            target1Name = utils().removeNonAscii(target1Data.member.nick);
-            target2Name = utils().removeNonAscii(target2Data.member.nick);
+            if (target1Name == null) {
+                target1Name = target1Data.username;
+            }
+
+            if (target2Name == null) {
+                target2Name = target2Data.username;
+            }
+
+            target1Name = utils().removeNonAscii(target1Name);
+            target2Name = utils().removeNonAscii(target2Name);
 
             if (target1Name.length == 0) {
                 target1Name = '??';
