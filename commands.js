@@ -678,20 +678,28 @@ const nikahin = new BotCommand(
     CommandCategories.image,
     (msgData) => {
         console.log();
-        console.log("[Command detected] [anu sayang]");
+        console.log("[Command detected] [anu nikahin]");
 
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
 
         const u2cb = () => {
-            const target1Id = msgData.mentions[0].id;
-            const target2Id = msgData.mentions[1].id;
+            const target1Data = msgData.mentions[0];
+            let target2Data;
+            if (msgData.mentions.length == 1) {
+                target2Data = msgData.mentions[1];
+            } else {
+                target2Data = msgData.mentions[0];
+            }
+
+            const target1Id = target1Data.id;
+            const target2Id = target2Data.id;
 
             let target1Name;
             let target2Name;
 
-            target1Name = utils().removeNonAscii(msgData.mentions[0].member.nick);
-            target2Name = utils().removeNonAscii(msgData.mentions[1].member.nick);
+            target1Name = utils().removeNonAscii(target1Data.member.nick);
+            target2Name = utils().removeNonAscii(target2Data.member.nick);
 
             if (target1Name.length == 0) {
                 target1Name = '??';
@@ -712,16 +720,16 @@ const nikahin = new BotCommand(
             target1Name = utils().capitalizeFirstLetterEachWord(target1Name);
             target2Name = utils().capitalizeFirstLetterEachWord(target2Name);
 
-            if (msgData.mentions[0].avatar == null) {
+            if (target1Data.avatar == null) {
                 utils().sendMessage(guildId, channelId, `*Nampaknya <@${target1Id}> ndak punya avatar.*`);
                 return;
-            } else if (msgData.mentions[1].avatar == null) {
+            } else if (target2Data.avatar == null) {
                 utils().sendMessage(guildId, channelId, `*Nampaknya <@${target2Id}> ndak punya avatar.*`);
                 return;
             }
 
-            const target1Url = utils().getUserAvatarUrl(target1Id, msgData.mentions[0].avatar, 64);
-            const target2Url = utils().getUserAvatarUrl(target2Id, msgData.mentions[1].avatar, 64);
+            const target1Url = utils().getUserAvatarUrl(target1Id, target1Data.avatar, 64);
+            const target2Url = utils().getUserAvatarUrl(target2Id, target2Data.avatar, 64);
 
             imageUtils().generateAktaNikah(target1Url, target1Name, target2Url, target2Name).then((blob) => {
                 utils().sendImage(guildId, channelId, blob, `aktanikah_${target1Id}_${target2Id}_${(new Date()).getTime()}.png`);
