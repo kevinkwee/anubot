@@ -226,9 +226,9 @@ const logchat = new BotCommand(
                         const { t, s, op, d } = payload;
                         if (op == 0 && t == 'MESSAGE_CREATE') {
                             if (d.author.id == targetUid || `!` + d.author.id == targetUid) {
-                                let newMsgContent = lastContent + String.raw`\n> **<t:${d.timestamp}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
+                                let newMsgContent = lastContent + String.raw`\n> **<t:${(new Date(d.timestamp)).getTime()}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
                                 if (newMsgContent.length >= 2000) {
-                                    newMsgContent = String.raw`**Catetan chat <@${targetUid}>**\n*klo bot ini spam salahin <@${msgData.author.id}>*` + String.raw`\n> **<t:${d.timestamp}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
+                                    newMsgContent = String.raw`**Catetan chat <@${targetUid}>**\n*klo bot ini spam salahin <@${msgData.author.id}>*` + String.raw`\n> **<t:${(new Date(d.timestamp)).getTime()}>**\n> *${(d.content).replace(regex, ` `).replace(/\\/g, ``)}*`;
                                 }
                                 utils().sendMessage(guildId, channelId, newMsgContent).then((newResponse) => {
                                     lastContent = newResponse.data.content.replace(regex, `\\n`);
