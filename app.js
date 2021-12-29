@@ -5,7 +5,7 @@ const ScriptLoader = require('./ScriptLoader.js');
 const { exit } = require("process");
 
 const commandHandlerLoader = new ScriptLoader('./command-handler.js');
-const utilsLoader = new ScriptLoader('./utils.js');
+const utilsLoader = new ScriptLoader('./utils/utils.js');
 
 const utils = () => { return utilsLoader.script };
 const commandHandler = () => { return commandHandlerLoader.script }
@@ -69,7 +69,7 @@ function connect(isResuming = false) {
             case 10:
                 const { heartbeat_interval } = d;
                 interval = heartbeat(heartbeat_interval, ws);
-                utils().editServerNick(process.env.JEJE_GUILD_ID, process.env.ONLINE_NICK);
+                // utils().editServerNick(process.env.JEJE_GUILD_ID, process.env.ONLINE_NICK);
                 break;
             case 11:
                 heartbeatAck = true;

@@ -7,22 +7,14 @@ import('node-fetch').then((module) => {
     fetch = module.default;
 });
 
-module.exports = {
-    editServerNick: editServerNick,
-    deleteMessage: deleteMessage,
-    editMessage: editMessage,
-    sendMessage: sendMessage,
-    sendImage: sendImage,
-    getCurrentTimeStr: getCurrentTimeStr,
-    getRandomQuote: getRandomQuote,
-    checkIsMsgMentioning: checkIsMsgMentioning,
-    getUser: getUser,
-    getMentionedUser: getMentionedUser,
-    sendPhotoTask: sendPhotoTask,
-    getPhotoResult: getPhotoResult,
-    fetchImageBlob: fetchImageBlob,
-    parseXml: parseXml,
-    buildXml: buildXml
+class MentionType {
+    static U2 = 'U2';
+    static U1R1 = 'U1R1';
+    static U1 = 'U1';
+    static R2 = 'R2';
+    static R1U1 = 'R1U1';
+    static R1 = 'R1';
+    static NM = 'NM';
 }
 
 function getCurrentTimeStr() {
@@ -213,7 +205,7 @@ function sendImage(guildId, channelId, blob, filename) {
         const formData = new FormData();
         formData.set('files[0]', blob, filename);
         formData.set('payload_json', '{"content":"","type":0,"attachments":[{"id":"0","filename":"' + filename + '"}]}');
-        
+
         try {
             let response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages", {
                 "credentials": "include",
@@ -275,19 +267,77 @@ function getRandomQuote() {
     });
 }
 
-function checkIsMsgMentioning(msgData) {
+function isMsgMentioningUser(msgData, index = 2) {
     const msgDataSplit = msgData.content.split(" ");
-    if (msgDataSplit.length >= 3) {
-        if (msgDataSplit[2].startsWith("<@") && msgDataSplit[2].endsWith(">")) {
+    if (msgDataSplit.length >= (index + 1)) {
+        if (!isMsgMentioningRole(msgData, index)
+            && (msgDataSplit[index].startsWith("<@") && msgDataSplit[index].endsWith(">"))) {
             return true;
         }
     }
     return false;
 }
 
-function getMentionedUser(msgData) {
+function isMsgMentioningRole(msgData, index = 2) {
     const msgDataSplit = msgData.content.split(" ");
-    const mentionedUserId = msgDataSplit[2].slice(2, -1).replace(`!`, '');
+    if (msgDataSplit.length >= (index + 1)) {
+        if ((msgDataSplit[index].startsWith("<@&") && msgDataSplit[index].endsWith(">"))) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getMentionType(msgData) {
+    if (isMsgMentioningUser(msgData) && isMsgMentioningUser(msgData, 3)) {
+        return MentionType.U2;
+    } else if (isMsgMentioningUser(msgData) && isMsgMentioningRole(msgData, 3)) {
+        return MentionType.U1R1;
+    } else if (isMsgMentioningUser(msgData)) {
+        return MentionType.U1;
+    } else if (isMsgMentioningRole(msgData) && isMsgMentioningRole(msgData, 3)) {
+        return MentionType.R2;
+    } else if (isMsgMentioningRole(msgData) && isMsgMentioningUser(msgData, 3)) {
+        return MentionType.R1U1;
+    } else if (isMsgMentioningRole(msgData)) {
+        return MentionType.R1;
+    } else {
+        return MentionType.NM;
+    }
+}
+
+const emptycb = () => { };
+
+function handleMentioningMessage(
+    msgData,
+    u2cb = emptycb,
+    u1r1cb = emptycb,
+    u1cb = emptycb,
+    r2cb = emptycb,
+    r1u1cb = emptycb,
+    r1cb = emptycb,
+    nmcb = emptycb
+) {
+    if (isMsgMentioningUser(msgData) && isMsgMentioningUser(msgData, 3)) {
+        u2cb();
+    } else if (isMsgMentioningUser(msgData) && isMsgMentioningRole(msgData, 3)) {
+        u1r1cb();
+    } else if (isMsgMentioningUser(msgData)) {
+        u1cb();
+    } else if (isMsgMentioningRole(msgData) && isMsgMentioningRole(msgData, 3)) {
+        r2cb();
+    } else if (isMsgMentioningRole(msgData) && isMsgMentioningUser(msgData, 3)) {
+        r1u1cb();
+    } else if (isMsgMentioningRole(msgData)) {
+        r1cb();
+    } else {
+        nmcb();
+    }
+}
+
+function getMentionedUserId(msgData, index = 2) {
+    const msgDataSplit = msgData.content.split(" ");
+    const mentionedUserId = msgDataSplit[index].slice(2, -1).replace(`!`, '');
     return mentionedUserId;
 }
 
@@ -328,6 +378,7 @@ function getUser(id) {
             }
         } catch (error) {
             console.log("Error when getting user data.");
+            console.log(error);
         }
     });
 }
@@ -410,4 +461,53 @@ function parseXml(xml) {
 
 function buildXml(map) {
     return (new XMLBuilder()).build(map);
+}
+
+function removeNonAscii(str) {
+    return str.replace(/[^\x00-x7F]/g, '');
+}
+
+function capitalizeFirstLetterEachWord(str) {
+    const strSplit = str.split(" ");
+    const newStrSplit = strSplit.map((value) => {
+        return value.charAt(0).toUpperCase() + value.slice(1);
+    });
+    let newStr = '';
+    newStrSplit.forEach((value, index) => {
+        newStr += value;
+        if (index != (newStrSplit.length - 1)) {
+            newStr += ' ';
+        }
+    })
+    return newStr;
+}
+
+function getUserAvatarUrl(id, avaHash, size = 512) {
+    return `https://cdn.discordapp.com/avatars/${id}/${avaHash}.png?size=${size}`;
+}
+
+module.exports = {
+    MentionType: MentionType,
+    editServerNick: editServerNick,
+    deleteMessage: deleteMessage,
+    editMessage: editMessage,
+    sendMessage: sendMessage,
+    sendImage: sendImage,
+    getCurrentTimeStr: getCurrentTimeStr,
+    getRandomQuote: getRandomQuote,
+    isMsgMentioningUser: isMsgMentioningUser,
+    isMsgMentioningRole: isMsgMentioningRole,
+    getMentionType: getMentionType,
+    handleMentioningMessage: handleMentioningMessage,
+    emptycb: emptycb,
+    getUser: getUser,
+    getMentionedUserId: getMentionedUserId,
+    sendPhotoTask: sendPhotoTask,
+    getPhotoResult: getPhotoResult,
+    fetchImageBlob: fetchImageBlob,
+    parseXml: parseXml,
+    buildXml: buildXml,
+    removeNonAscii: removeNonAscii,
+    getUserAvatarUrl: getUserAvatarUrl,
+    capitalizeFirstLetterEachWord: capitalizeFirstLetterEachWord
 }

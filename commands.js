@@ -1,11 +1,15 @@
-const { BotCommand, CommandCategories } = require('./BotCommand.js');
 const ScriptLoader = require('./ScriptLoader.js');
+const { BotCommand, CommandCategories } = require('./BotCommand.js');
 const { FormDataEncoder } = require('form-data-encoder');
+const { MentionType } = require('./utils/utils.js');
 const { exit } = require("process");
 const fs = require('fs');
 
-const utilsLoader = new ScriptLoader('./utils.js');
+const utilsLoader = new ScriptLoader('./utils/utils.js');
 const utils = () => { return utilsLoader.script };
+
+const imageUtilsLoader = new ScriptLoader('./utils/image-utils.js');
+const imageUtils = () => { return imageUtilsLoader.script };
 
 const ping = new BotCommand(
     'ping',
@@ -285,7 +289,21 @@ const mleyot = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'mleyot', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'mleyot', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     },
 );
 
@@ -311,7 +329,22 @@ const buaya = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'buaya', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'buaya', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
+
     }
 );
 
@@ -337,7 +370,21 @@ const oleng = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'oleng', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'oleng', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -363,7 +410,21 @@ const emosi = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'emosi', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'emosi', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -389,7 +450,21 @@ const troll = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'troll', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'troll', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -415,7 +490,21 @@ const kedip = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'kedip', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'kedip', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -441,7 +530,21 @@ const oops = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'oops', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'oops', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -467,7 +570,21 @@ const senyum = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'senyum', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'senyum', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
@@ -493,54 +610,285 @@ const kero = new BotCommand(
             }
         };
 
-        handlePhotoCommand(msgData, data, 'kero', 'gif');
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
+            const dataXml = utils().buildXml(data);
+
+            handlePhotoCommand(msgData, dataXml, 'kero', 'gif');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
 );
 
-function handlePhotoCommand(msgData, data, filename_prefix, filename_suffix) {
-    const guildId = msgData.guild_id;
-    const channelId = msgData.channel_id;
+const beban = new BotCommand(
+    'beban',
+    'Nyindir si beban.',
+    process.env.CMD_PREFIX + ' beban',
+    null,
+    CommandCategories.image,
+    (msgData) => {
+        console.log();
+        console.log("[Command detected] [anu beban]");
 
-    if (utils().checkIsMsgMentioning(msgData)) {
-        const targetUid = utils().getMentionedUser(msgData);
+        const data = {
+            image_process_call: {
+                image_url: '',
+                methods_list: {
+                    method: {
+                        name: 'collage',
+                        params: 'template_name=heavy_load'
+                    }
+                },
+                template_watermark: false,
+            }
+        };
+        console.log(data.image_process_call.methods_list.method);
 
-        utils().getUser(targetUid).then((response) => {
-            const avatarHash = response.data.avatar;
-            const avatarUrl = `https://cdn.discordapp.com/avatars/${targetUid}/${avatarHash}.png?size=512`;
-            data.image_process_call.image_url = avatarUrl;
+        const u1cb = () => {
+            const targetId = msgData.mentions[0].id;
+            const targetUrl = utils().getUserAvatarUrl(targetId, msgData.mentions[0].avatar, 512);
+            data.image_process_call.image_url = targetUrl;
             const dataXml = utils().buildXml(data);
 
-            utils().sendPhotoTask(dataXml).then((response) => {
-                const { image_process_response } = utils().parseXml(response.data);
-                if (image_process_response.status == 'OK') {
-                    const getPhotoResult = () => {
-                        utils().getPhotoResult(image_process_response.request_id).then((response) => {
-                            const { image_process_response } = utils().parseXml(response.data);
-                            if (image_process_response.status == 'OK') {
-                                utils().fetchImageBlob(image_process_response.result_url).then((response) => {
-                                    const filename = `${filename_prefix}_${targetUid}_${avatarHash}.${filename_suffix}`;
-                                    utils().sendImage(guildId, channelId, response.data, filename);
-                                });
-                            } else if (image_process_response.status == 'InProgress') {
-                                console.log("Pho.to result is in progress. Waiting for 0.5s before retrying...");
-                                setTimeout(() => {
-                                    console.log("Retry to get pho.to result...");
-                                    getPhotoResult();
-                                }, 500);
-                            } else if (image_process_response.err_code == -1000) {
-                                utils().sendMessage(guildId, channelId, "*Khusus command ini pake foto yg wajahnya jelas ya mz...*");
-                            } else {
-                                utils().sendMessage(guildId, channelId, "*Maaf baru error mz...*\\n*Cepet benerin woi <@545945146051526656>*\\n**Get result " + image_process_response.status + ": " + image_process_response.err_code + "**");
-                            }
-                        });
-                    };
-                    getPhotoResult();
-                } else {
-                    utils().sendMessage(guildId, channelId, "*Maaf baru error mz...*\\n*Cepet benerin woi <@545945146051526656>*\\n**Send task " + image_process_response.status + ": " + image_process_response.err_code + "**");
-                }
-            });
-        });
+            handlePhotoCommand(msgData, dataXml, 'beban', 'png');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
     }
+);
+
+const nikahin = new BotCommand(
+    'nikahin',
+    'Akta nikah adalah bukti.',
+    process.env.CMD_PREFIX + ' nikahin @target1 @target2[optional]',
+    null,
+    CommandCategories.image,
+    (msgData) => {
+        console.log();
+        console.log("[Command detected] [anu sayang]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+
+        const u2cb = () => {
+            const target1Id = msgData.mentions[0].id;
+            const target2Id = msgData.mentions[1].id;
+
+            let target1Name;
+            let target2Name;
+
+            target1Name = utils().removeNonAscii(msgData.mentions[0].member.nick);
+            target2Name = utils().removeNonAscii(msgData.mentions[1].member.nick);
+
+            if (target1Name.length == 0) {
+                target1Name = '??';
+            }
+
+            if (target2Name.length == 0) {
+                target2Name = '??';
+            }
+
+            if (target1Name.length > 10) {
+                target1Name = target1Name.slice(0, 10);
+            }
+
+            if (target2Name.length > 10) {
+                target2Name = target2Name.slice(0, 10);
+            }
+
+            target1Name = utils().capitalizeFirstLetterEachWord(target1Name);
+            target2Name = utils().capitalizeFirstLetterEachWord(target2Name);
+
+            if (msgData.mentions[0].avatar == null) {
+                utils().sendMessage(guildId, channelId, `*Nampaknya <@${target1Id}> ndak punya avatar.*`);
+                return;
+            } else if (msgData.mentions[1].avatar == null) {
+                utils().sendMessage(guildId, channelId, `*Nampaknya <@${target2Id}> ndak punya avatar.*`);
+                return;
+            }
+
+            const target1Url = utils().getUserAvatarUrl(target1Id, msgData.mentions[0].avatar, 64);
+            const target2Url = utils().getUserAvatarUrl(target2Id, msgData.mentions[1].avatar, 64);
+
+            imageUtils().generateAktaNikah(target1Url, target1Name, target2Url, target2Name).then((blob) => {
+                utils().sendImage(guildId, channelId, blob, `aktanikah_${target1Id}_${target2Id}_${(new Date()).getTime()}.png`);
+            });
+        };
+
+        const u1cb = () => {
+            const target1Id = msgData.author.id;
+            const target2Id = msgData.mentions[0].id;
+
+            let target1Name;
+            let target2Name;
+
+            target1Name = utils().removeNonAscii(msgData.member.nick);
+            target2Name = utils().removeNonAscii(msgData.mentions[0].member.nick);
+
+            if (target1Name.length == 0) {
+                target1Name = '??';
+            }
+
+            if (target2Name.length == 0) {
+                target2Name = '??';
+            }
+
+            if (target1Name.length > 10) {
+                target1Name = target1Name.slice(0, 10);
+            }
+
+            if (target2Name.length > 10) {
+                target2Name = target2Name.slice(0, 10);
+            }
+
+            target1Name = utils().capitalizeFirstLetterEachWord(target1Name);
+            target2Name = utils().capitalizeFirstLetterEachWord(target2Name);
+
+            if (msgData.author.avatar == null) {
+                utils().sendMessage(guildId, channelId, `*Nampaknya <@${target1Id}> ndak punya avatar.*`);
+                return;
+            } else if (msgData.mentions[0].avatar == null) {
+                utils().sendMessage(guildId, channelId, `*Nampaknya <@${target2Id}> ndak punya avatar.*`);
+                return;
+            }
+
+            const target1Url = utils().getUserAvatarUrl(target1Id, msgData.author.avatar, 64);
+            const target2Url = utils().getUserAvatarUrl(target2Id, msgData.mentions[0].avatar, 64);
+
+            imageUtils().generateAktaNikah(target1Url, target1Name, target2Url, target2Name).then((blob) => {
+                utils().sendImage(guildId, channelId, blob, `aktanikah_${target1Id}_${target2Id}_${(new Date()).getTime()}.png`);
+            });
+        };
+
+        const userAndRoleCb = () => {
+            utils().sendMessage(guildId, channelId, '*Buseet dahh, jangan satu role juga kau nikahin mz... -_-*');
+        };
+
+        const r2cb = () => {
+            utils().sendMessage(guildId, channelId, '*Gilaakk, mau ngejodohin dua role mz??*');
+        };
+
+        const nmcb = () => {
+            utils().sendMessage(guildId, channelId, '*Mo nikahin setan apa gmn mz? kok gk mention someone...\\nApa jangan2 km **JOMBLO** tp pengen nikah?*');
+        };
+
+        utils().handleMentioningMessage(
+            msgData,
+            u2cb,
+            userAndRoleCb,
+            u1cb,
+            r2cb,
+            userAndRoleCb,
+            userAndRoleCb,
+            nmcb
+        );
+    }
+);
+
+const baloncinta = new BotCommand(
+    'baloncinta',
+    'Lop uuuuu <3 <3',
+    process.env.CMD_PREFIX + ' baloncinta',
+    'bc',
+    CommandCategories.image,
+    (msgData) => {
+        console.log();
+        console.log("[Command detected] [anu baloncinta]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+
+        const data = (url1, url2) => {
+            return String.raw`<image_process_call>
+            <image_url order="1">${url1}</image_url>
+            <image_url order="2">${url2}</image_url>
+            <methods_list>
+            <method order="1">
+               <name>collage</name>
+               <params>template_name=heavenly_love;crop_portrait=TRUE
+               </params>
+            </method>
+            </methods_list>
+            <template_watermark>false</template_watermark>
+            </image_process_call>`;
+        };
+
+        const u1cb = () => {
+            utils().sendMessage(guildId, channelId, '*Command ini butuh 2 tag y mz...*');
+        };
+
+        const u2cb = () => {
+            const target1Id = msgData.mentions[0].id;
+            const target2Id = msgData.mentions[1].id;
+
+            const target1Url = utils().getUserAvatarUrl(target1Id, msgData.mentions[0].avatar, 512);
+            const target2Url = utils().getUserAvatarUrl(target2Id, msgData.mentions[1].avatar, 512);
+
+            const dataXml = data(target1Url, target2Url);
+
+            handlePhotoCommand(msgData, dataXml, 'baloncinta', 'png');
+        }
+
+        utils().handleMentioningMessage(
+            msgData,
+            u2cb,
+            utils().emptycb,
+            u1cb
+        );
+    }
+);
+
+function handlePhotoCommand(msgData, dataXml, filename_prefix, filename_suffix) {
+    const guildId = msgData.guild_id;
+    const channelId = msgData.channel_id;
+    const targetId = msgData.mentions[0].id;
+    const targetAvaHash = msgData.mentions[0].avatar;
+
+    utils().sendPhotoTask(dataXml).then((response) => {
+        const { image_process_response } = utils().parseXml(response.data);
+        if (image_process_response.status == 'OK') {
+            const getPhotoResult = () => {
+                utils().getPhotoResult(image_process_response.request_id).then((response) => {
+                    const { image_process_response } = utils().parseXml(response.data);
+                    if (image_process_response.status == 'OK') {
+                        utils().fetchImageBlob(image_process_response.result_url).then((response) => {
+                            const filename = `${filename_prefix}_${targetId}_${targetAvaHash}.${filename_suffix}`;
+                            utils().sendImage(guildId, channelId, response.data, filename);
+                        });
+                    } else if (image_process_response.status == 'InProgress') {
+                        console.log("Pho.to result is in progress. Waiting for 0.5s before retrying...");
+                        setTimeout(() => {
+                            console.log("Retry to get pho.to result...");
+                            getPhotoResult();
+                        }, 500);
+                    } else if (image_process_response.err_code == -1000) {
+                        utils().sendMessage(guildId, channelId, "*Khusus command ini pake foto yg wajahnya jelas ya mz...*");
+                    } else if (image_process_response.err_code == -2) {
+                        utils().sendMessage(guildId, channelId, `*Nampaknya <@${targetId} nggak punya pp...>*`);
+                    } else {
+                        utils().sendMessage(guildId, channelId, "*Maaf baru error mz...*\\n*Cepet benerin woi <@545945146051526656>*\\n**Get result " + image_process_response.status + ": " + image_process_response.err_code + "**");
+                    }
+                });
+            };
+            getPhotoResult();
+        } else {
+            utils().sendMessage(guildId, channelId, "*Maaf baru error mz...*\\n*Cepet benerin woi <@545945146051526656>*\\n**Send task " + image_process_response.status + ": " + image_process_response.err_code + "**");
+        }
+    });
+
 }
 
-module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, help];
+module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help];
