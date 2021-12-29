@@ -686,10 +686,11 @@ const nikahin = new BotCommand(
         const u2cb = () => {
             const target1Data = msgData.mentions[0];
             let target2Data;
+
             if (msgData.mentions.length == 1) {
-                target2Data = msgData.mentions[1];
-            } else {
                 target2Data = msgData.mentions[0];
+            } else {
+                target2Data = msgData.mentions[1];
             }
 
             const target1Id = target1Data.id;
