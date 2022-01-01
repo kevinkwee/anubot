@@ -117,7 +117,7 @@ const addAdmin = new BotCommand(
                         }
                     });
                 } else {
-                    targetName = msgData.author.username + '#' + msgData.author.discriminator;
+                    targetName = msgData.mentions[0].username + '#' + msgData.mentions[0].discriminator;
                 }
 
                 set(targetRef, { 'name': targetName }).then(() => {
