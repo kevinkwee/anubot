@@ -262,7 +262,7 @@ const stoplogchat = new BotCommand(
         const channelId = msgData.channel_id;
 
         if (msgData.author.id != logchatUser) {
-            utils().sendMessage(guildId, channelId, "*Ih kmu sapa, km bukan yg ngidupin logchat tadi...\nGabole matiin punya orang...*");
+            utils().sendMessage(guildId, channelId, "*Ih kmu sapa, km bukan yg ngidupin logchat tadi...\\nGabole matiin punya orang...*");
             return;
         }
 
