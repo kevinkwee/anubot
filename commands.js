@@ -11,6 +11,8 @@ const utils = () => { return utilsLoader.script };
 const imageUtilsLoader = new ScriptLoader('./utils/image-utils.js');
 const imageUtils = () => { return imageUtilsLoader.script };
 
+var logchatUser = null;
+
 const ping = new BotCommand(
     'ping',
     'Buat cek delay anu 🤖',
@@ -220,6 +222,7 @@ const logchat = new BotCommand(
                 let lastBotMsgId = "";
                 const msgContent = String.raw`${lastContent}\n> *Blom ngechat*`;
                 utils().sendMessage(guildId, channelId, msgContent).then((response) => {
+                    logchatUser = msgData.author.id;
                     lastBotMsgId = response.data.id;
                     const logMsg = (data) => {
                         let payload = JSON.parse(data);
@@ -258,8 +261,14 @@ const stoplogchat = new BotCommand(
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
 
+        if (msgData.author.id != logchatUser) {
+            utils().sendMessage(guildId, channelId, "*Ih kmu sapa, km bukan yg ngidupin logchat tadi...\nGabole matiin punya orang...*");
+            return;
+        }
+
         if (ws.listenerCount("message") > 1) {
             ws.removeListener("message", ws.listeners("message")[1]);
+            logchatUser = null;
             utils().sendMessage(guildId, channelId, "*Logchat uda kustop yaa..*");
         } else {
             utils().sendMessage(guildId, channelId, "*Ndak ada logchat yg jalan mz..*");
