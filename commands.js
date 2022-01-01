@@ -104,7 +104,7 @@ const addAdmin = new BotCommand(
 
             utils().sendMessage(guildId, channelId, `*Baru nambahin <@${targetId}> ke daftar admin...*`).then((response) => {
                 const targetRef = ref(database, `${ADMINS_PATH}/${targetId}`);
-                let targetName;
+                let targetName = '';
 
                 if (msgDataSplit.length > 3) {
                     msgDataSplit.forEach((value, index) => {
