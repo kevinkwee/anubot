@@ -10,11 +10,12 @@ class BotCommand {
 }
 
 class CommandCategories {
-    static getList() { return [this.others, this.text, this.image] };
+    static getList() { return [this.others, this.text, this.image, this.hanyaOwner] };
 
     static others = 'Lain-lain';
     static text = 'Teks';
     static image = 'Gambar';
+    static hanyaOwner = 'Hanya Owner';
 }
 
 module.exports = { BotCommand: BotCommand, CommandCategories: CommandCategories };

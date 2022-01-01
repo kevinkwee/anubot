@@ -2,7 +2,8 @@ const ScriptLoader = require('./ScriptLoader.js');
 const { BotCommand, CommandCategories } = require('./BotCommand.js');
 const { FormDataEncoder } = require('form-data-encoder');
 const { MentionType } = require('./utils/utils.js');
-const { exit } = require("process");
+const { getApp } = require('firebase/app');
+const { getDatabase, ref, set, onValue } = require('firebase/database');
 const fs = require('fs');
 
 const utilsLoader = new ScriptLoader('./utils/utils.js');
@@ -12,6 +13,42 @@ const imageUtilsLoader = new ScriptLoader('./utils/image-utils.js');
 const imageUtils = () => { return imageUtilsLoader.script };
 
 var logchatUser = null;
+
+const OWNERS_PATH = 'owners';
+const ADMINS_PATH = 'admins';
+
+const database = getDatabase(getApp());
+const ownersRef = ref(database, OWNERS_PATH);
+const adminsRef = ref(database, ADMINS_PATH);
+
+var owners = [];
+var admins = [];
+
+onValue(ownersRef, (snapshot) => {
+    if (snapshot.exists()) {
+        let newOwnerList = [];
+        const map = new Map(Object.entries(snapshot.val()));
+        map.forEach((value, key) => {
+            newOwnerList.push(key);
+        });
+        owners = newOwnerList;
+        return;
+    }
+    owners = [];
+});
+
+onValue(adminsRef, (snapshot) => {
+    if (snapshot.exists()) {
+        let newAdminList = [];
+        const map = new Map(Object.entries(snapshot.val()));
+        map.forEach((value, key) => {
+            newAdminList.push([key]);
+        });
+        admins = newAdminList;
+        return;
+    }
+    admins = [];
+});
 
 const ping = new BotCommand(
     'ping',
@@ -34,6 +71,70 @@ const ping = new BotCommand(
             description: `📶 *Latency: ${ping}ms*`,
         }]);
     },
+);
+
+const addAdmin = new BotCommand(
+    'addadmin',
+    'Buat nambah admin',
+    process.env.CMD_PREFIX + ' addadmin',
+    'aadm',
+    CommandCategories.hanyaOwner,
+    (msgData) => {
+        console.log();
+        console.log("[Command detected] [anu addadmin]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+        const msgDataSplit = msgData.content.split(" ");
+        let hasBeenAdded = false;
+
+        const targetId = msgData.mentions[0].id;
+
+        admins.forEach((value) => {
+            if (value == targetId) {
+                hasBeenAdded = true;
+            }
+        });
+
+        const u1cb = () => {
+            if (hasBeenAdded) {
+                utils().sendMessage(guildId, channelId, `*<@${targetId}> udah ada di daftar admin.*`);
+                return;
+            }
+
+            utils().sendMessage(guildId, channelId, `*Baru nambahin <@${targetId}> ke daftar admin...*`).then((response) => {
+                const targetRef = ref(database, `${ADMINS_PATH}/${targetId}`);
+                let targetName;
+
+                if (msgDataSplit.length > 3) {
+                    msgDataSplit.forEach((value, index) => {
+                        if (index > 2) {
+                            if (index == (msgDataSplit.length - 1)) {
+                                targetName += value;
+                            } else {
+                                targetName += value + ' ';
+                            }
+                        }
+                    });
+                } else {
+                    targetName = msgData.author.username + '#' + msgData.author.discriminator;
+                }
+
+                set(targetRef, { 'name': targetName }).then(() => {
+                    utils().editMessage(guildId, channelId, response.data.id, `*Udah kutambahkan <@${targetId}> ke daftar admin ya.*`);
+                }).catch(() => {
+                    utils().editMessage(guildId, channelId, response.data.id, `*Yahh, gagal masukin <@${targetId}> ke daftar admin nihh.*`);
+                });
+            });
+        }
+
+        utils().handleMentioningMessage(
+            msgData,
+            utils().emptycb,
+            utils().emptycb,
+            u1cb
+        );
+    }
 );
 
 const help = new BotCommand(
@@ -260,10 +361,26 @@ const stoplogchat = new BotCommand(
 
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
+        const msgAuthorId = msgData.author.id;
+        let isPrivilegedUser = false;
 
-        if (msgData.author.id != logchatUser) {
-            utils().sendMessage(guildId, channelId, "*Ih kmu sapa, km bukan yg ngidupin logchat tadi...\\nGabole matiin punya orang...*");
-            return;
+        owners.forEach((value) => {
+            if (value == msgAuthorId) {
+                isPrivilegedUser = true;
+            }
+        });
+
+        admins.forEach((value) => {
+            if (value == msgAuthorId) {
+                isPrivilegedUser = true;
+            }
+        });
+
+        if (!isPrivilegedUser) {
+            if (msgData.author.id != logchatUser) {
+                utils().sendMessage(guildId, channelId, "*Ih kmu sapa, km bukan yg ngidupin logchat tadi...\\nGabole matiin punya orang...*");
+                return;
+            }
         }
 
         if (ws.listenerCount("message") > 1) {
@@ -917,4 +1034,4 @@ function handlePhotoCommand(msgData, dataXml, filename_prefix, filename_suffix) 
 
 }
 
-module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help];
+module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help, addAdmin];
