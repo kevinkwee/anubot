@@ -219,6 +219,41 @@ const help = new BotCommand(
     }
 );
 
+const joinThread = new BotCommand(
+    'jointhread',
+    'Buat masukin anubot ke thread.',
+    process.env.CMD_PREFIX + ' jointhread [threadId]',
+    'jt',
+    CommandCategories.hanyaOwner,
+    (msgData) => {
+        console.log();
+        console.log("[Command detected] [anu randomquote]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+
+        const isPrivilegedUser = utils().isPrivilegedUser(owners, admins, msgData.author.id);
+
+        if (!isPrivilegedUser) {
+            utils().sendMessage(guildId, channelId, '*Ishh, kamu bukan owner/admin, aku gamau join thread.*');
+            return;
+        }
+
+        const msgDataSplit = msgData.content.split(" ");
+
+        if (msgDataSplit.length > 2) {
+            const threadId = msgDataSplit[2];
+            utils().joinThread(guildId, channelId, threadId).then(() => {
+                utils().sendMessage(guildId, channelId, '*Okzz, aku uda join threadnya.*');
+            }).catch((err) => {
+                utils().sendMessage(guildId, channelId, '*Yahh, aku gagal join threadnya.*\\n*Nih kode errornya: ' + err.status + '*');
+            });
+        } else {
+            utils().sendMessage(guildId, channelId, '*Ishh, mau join thread mana?! Kasih thread id nya donggg!!*');
+        }
+    }
+);
+
 const randomQuote = new BotCommand(
     'randomquote',
     'Bctan randomm',
@@ -362,19 +397,8 @@ const stoplogchat = new BotCommand(
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
         const msgAuthorId = msgData.author.id;
-        let isPrivilegedUser = false;
 
-        owners.forEach((value) => {
-            if (value == msgAuthorId) {
-                isPrivilegedUser = true;
-            }
-        });
-
-        admins.forEach((value) => {
-            if (value == msgAuthorId) {
-                isPrivilegedUser = true;
-            }
-        });
+        const isPrivilegedUser = utils().isPrivilegedUser(owners, admins, msgAuthorId);
 
         if (!isPrivilegedUser) {
             if (msgData.author.id != logchatUser) {
@@ -1034,4 +1058,4 @@ function handlePhotoCommand(msgData, dataXml, filename_prefix, filename_suffix) 
 
 }
 
-module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help, addAdmin];
+module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help, addAdmin, joinThread];

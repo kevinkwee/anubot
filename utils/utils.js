@@ -244,6 +244,67 @@ function sendImage(guildId, channelId, blob, filename) {
     });
 }
 
+function joinThread(guildId, channelId, threadId) {
+    return new Promise(async (resolve, reject) => {
+        console.log('Joining the thread...');
+        try {
+            const response = await fetch("https://discord.com/api/v9/channels/" + threadId + "/thread-members/@me?location=Context%20Menu", {
+                "credentials": "include",
+                "headers": {
+                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
+                    "Accept": "*/*",
+                    "Accept-Language": "en-US,en;q=0.5",
+                    "Authorization": process.env.TOKEN,
+                    "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4OTI0LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
+                    "X-Discord-Locale": "en-US",
+                    "X-Debug-Options": "bugReporterEnabled",
+                    "Sec-Fetch-Dest": "empty",
+                    "Sec-Fetch-Mode": "no-cors",
+                    "Sec-Fetch-Site": "same-origin",
+                    "Pragma": "no-cache",
+                    "Cache-Control": "no-cache"
+                },
+                "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
+                "method": "POST",
+                "mode": "cors"
+            });
+
+            if (response.status == 204) {
+                console.log("Joined the thread.");
+                resolve({
+                    status: response.status,
+                    data: null,
+                });
+            } else {
+                console.log("Failed to join the thread. " + response.status);
+                reject({
+                    status: response.status
+                });
+            }
+        } catch (error) {
+            console.log('Error when joining the thread.');
+        }
+    });
+}
+
+function isPrivilegedUser(owners, admins, userToCheck) {
+    let isPrivilegedUser = false;
+
+    owners.forEach((value) => {
+        if (value == userToCheck) {
+            isPrivilegedUser = true;
+        }
+    });
+
+    admins.forEach((value) => {
+        if (value == userToCheck) {
+            isPrivilegedUser = true;
+        }
+    });
+
+    return isPrivilegedUser;
+}
+
 function getRandomQuote() {
     return new Promise(async (resolve, reject) => {
         console.log("Getting random quote...");
@@ -493,6 +554,8 @@ module.exports = {
     editMessage: editMessage,
     sendMessage: sendMessage,
     sendImage: sendImage,
+    joinThread: joinThread,
+    isPrivilegedUser: isPrivilegedUser,
     getCurrentTimeStr: getCurrentTimeStr,
     getRandomQuote: getRandomQuote,
     isMsgMentioningUser: isMsgMentioningUser,
