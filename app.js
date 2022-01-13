@@ -142,30 +142,18 @@ function handleEvent(t, s, op, d, ws) {
 
 function updateMusicGuildData(guildId, channelId, userId) {
     if (userId == process.env.BOT_ID) {
-        console.log();
-        console.log("USER ID SAMAA");
         setBotCurrentVoiceChannelId(channelId);
-        console.log('BOT VC: ' + getBotCurrentVoiceChannelId());
-        console.log();
     }
 
-    console.log();
-    console.log("ADD GUILD VC STATE");
     addGuildVoiceStateEntry(guildId, {
         id: userId,
         channel_id: channelId
     });
 
-    console.log();
-    console.log("BOT STATE");
     console.log(getGuildVoiceState(guildId));
-    console.log();
 
     if (userId == process.env.BOT_ID) {
-        console.log();
-        console.log("BAWAH USER ID SAMA: RECOUNT");
         recountBotVoiceChannelMember(guildId);
-        console.log("COUNT: " + getBotVoiceChannelMemberCount());
     }
 }
 
