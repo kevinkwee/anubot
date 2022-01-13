@@ -154,10 +154,12 @@ function updateMusicGuildData(guildId, channelId, userId) {
 }
 
 function leaveVoiceChannelIfAlone(guildId) {
-    const guildMusicPlayer = getGuildMusicPlayer(guildId);
-    if (guildMusicPlayer && getBotVoiceChannelMemberCount() <= 1) {
-        guildMusicPlayer.onAlone();
-    }
+    setTimeout(() => {
+        const guildMusicPlayer = getGuildMusicPlayer(guildId);
+        if (guildMusicPlayer && getBotVoiceChannelMemberCount() <= 1) {
+            guildMusicPlayer.onAlone();
+        }
+    }, 5e3);
 }
 
 function heartbeat(h, ws) {

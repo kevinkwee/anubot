@@ -159,8 +159,6 @@ function editMessage(guildId, channelId, messageId, content, embeds = []) {
 function sendMessage(guildId, channelId, content, embeds = []) {
     let processedContent = content.replace(/["]/g, String.raw`\"`);
     processedContent = content.replace(/\n/g, "\\n");
-    // TODO: DELETE THIS LOG ATER ALL TEST IS PASSED
-    console.log(processedContent);
     return new Promise(async (resolve, reject) => {
         console.log("Sending message...");
         try {
