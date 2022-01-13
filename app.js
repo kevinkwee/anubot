@@ -150,8 +150,6 @@ function updateMusicGuildData(guildId, channelId, userId) {
         channel_id: channelId
     });
 
-    console.log(getGuildVoiceState(guildId));
-
     if (userId == process.env.BOT_ID) {
         recountBotVoiceChannelMember(guildId);
     }
