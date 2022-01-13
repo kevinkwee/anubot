@@ -1,5 +1,9 @@
 .env
 tes.js
+tes.txt
+voice_tes.js
+commands.js
 msg.json
 result.png
 node_modules/
+json_structure_docs/

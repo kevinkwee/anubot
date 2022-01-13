@@ -1,3 +1,7 @@
+String.prototype.splitByWhitespace = function () {
+    return this.split(/\s+/g);
+};
+
 require('dotenv').config();
 const { initializeApp } = require('firebase/app');
 
@@ -16,13 +20,23 @@ initializeApp(firebaseConfig);
 
 const WebSocket = require('ws');
 const ScriptLoader = require('./ScriptLoader.js');
+
 const { exit } = require("process");
+const {
+    addGuildVoiceStateEntry,
+    setBotCurrentVoiceChannelId,
+    getBotVoiceChannelMemberCount,
+    recountBotVoiceChannelMember
+} = require('./commands/music/guild-data.js');
 
-const commandHandlerLoader = new ScriptLoader('./command-handler.js');
+const fs = require('fs');
+const { getGuildMusicPlayer } = require('./commands/music/bot-data.js');
+
 const utilsLoader = new ScriptLoader('./utils/utils.js');
-
 const utils = () => { return utilsLoader.script };
-const commandHandler = () => { return commandHandlerLoader.script }
+
+const commandHandlerLoader = new ScriptLoader('./commands/command-handler.js');
+const commandHandler = () => { return commandHandlerLoader.script };
 
 let interval = 0;
 let sequence = null;
@@ -104,6 +118,18 @@ function handleEvent(t, s, op, d, ws) {
         case 'READY':
             sessionId = d.session_id;
             break;
+        case 'READY_SUPPLEMENTAL':
+            d.guilds.forEach((guild) => {
+                guild.voice_states.forEach((voiceState) => {
+                    updateMusicGuildData(guild.id, voiceState.channel_id, voiceState.user_id);
+                    leaveVoiceChannelIfAlone(guild.id);
+                });
+            });
+            break;
+        case 'VOICE_STATE_UPDATE':
+            updateMusicGuildData(d.guild_id, d.channel_id, d.user_id);
+            leaveVoiceChannelIfAlone(d.guild_id);
+            break;
         case 'MESSAGE_CREATE':
             commandHandler().handle(d, ws);
             break;
@@ -112,10 +138,33 @@ function handleEvent(t, s, op, d, ws) {
     }
 }
 
+function updateMusicGuildData(guildId, channelId, userId) {
+    if (userId == process.env.BOT_ID) {
+        setBotCurrentVoiceChannelId(channelId);
+    }
+
+    addGuildVoiceStateEntry(guildId, {
+        id: userId,
+        channel_id: channelId
+    });
+
+    if (userId == process.env.BOT_ID) {
+        recountBotVoiceChannelMember(guildId);
+    }
+}
+
+function leaveVoiceChannelIfAlone(guildId) {
+    const guildMusicPlayer = getGuildMusicPlayer(guildId);
+    if (guildMusicPlayer && getBotVoiceChannelMemberCount() <= 1) {
+        guildMusicPlayer.onAlone();
+    }
+}
+
 function heartbeat(h, ws) {
     if (zombieHeartbeatCount == 3) {
         console.log(`[${utils().getCurrentTimeStr()}] ZOMBIED CONNECTION`);
-        resumeSession();
+        ws.close();
+        connect(true);
         return;
     }
 

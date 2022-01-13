@@ -1,5 +1,5 @@
 const ScriptLoader = require('./ScriptLoader.js');
-const { BotCommand, CommandCategories } = require('./BotCommand.js');
+const { BotCommand, CommandCategories } = require('./commands/BotCommand.js');
 const { FormDataEncoder } = require('form-data-encoder');
 const { MentionType } = require('./utils/utils.js');
 const { getApp } = require('firebase/app');
@@ -11,6 +11,9 @@ const utils = () => { return utilsLoader.script };
 
 const imageUtilsLoader = new ScriptLoader('./utils/image-utils.js');
 const imageUtils = () => { return imageUtilsLoader.script };
+
+const voiceLoader = new ScriptLoader('./voice/voice.js');
+const voice = () => { return voiceLoader.script };
 
 var logchatUser = null;
 
@@ -73,6 +76,54 @@ const ping = new BotCommand(
     },
 );
 
+const joinvoice = new BotCommand(
+    'joinvoice',
+    'Buat masukin anu ke voice channel. [ONLY OWNER/NOT RELEASED YET]',
+    process.env.CMD_PREFIX + ' joinvoice [voice_channel_id]',
+    'jv',
+    CommandCategories.hanyaOwner,
+    (msgData, ws) => {
+        console.log();
+        console.log("[Command detected] [anu joinvoice]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+        const msgDataSplit = msgData.content.split(" ");
+
+        const isPrivilegedUser = utils().isPrivilegedUser(owners, [], msgData.author.id);
+
+        if (!isPrivilegedUser) {
+            utils().sendMessage(guildId, channelId, "*Uda dibilang cm owner yg bisa pake command ini...\\nMasihhh aja ngeyell... hmmm*");
+            return;
+        }
+
+        // const payload = {
+        //     op: 4,
+        //     d: {
+        //         guild_id: guildId,
+        //         channel_id: null,
+        //         self_mute: false,
+        //         self_deaf: false
+        //     }
+        // };
+
+        // ws.send(JSON.stringify(payload));
+        voice().connectToChannel(guildId, msgDataSplit[2], ws).then((connection) => {
+            console.log("SUCCES TO JOIN");
+            voice().playSong().then((player) => {
+                console.log('Song is ready to play!');
+                connection.subscribe(player);
+                console.log("lagu sedang dimainkan");
+            }).catch((e) => {
+                console.log('Song is NOT ready to play!');
+                console.error(error);
+            });
+        }).catch((e) => {
+            console.log(`GAGAL TO JOIN: ${e.stack}`);
+        });
+    },
+);
+
 const addAdmin = new BotCommand(
     'addadmin',
     'Buat nambah admin',
@@ -86,6 +137,14 @@ const addAdmin = new BotCommand(
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
         const msgDataSplit = msgData.content.split(" ");
+
+        const isPrivilegedUser = utils().isPrivilegedUser(owners, [], msgAuthorId);
+
+        if (!isPrivilegedUser) {
+            utils().sendMessage(guildId, channelId, "*Uda dibilang cm owner yg bisa pake command ini...\\nMasihhh aja ngeyell... hmmm*");
+            return;
+        }
+
         let hasBeenAdded = false;
 
         const targetId = msgData.mentions[0].id;
@@ -1058,4 +1117,4 @@ function handlePhotoCommand(msgData, dataXml, filename_prefix, filename_suffix) 
 
 }
 
-module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help, addAdmin, joinThread];
+module.exports = [ping, randomQuote, logchat, stoplogchat, mleyot, buaya, oleng, emosi, troll, kedip, oops, senyum, kero, baloncinta, nikahin, beban, help, addAdmin, joinThread, joinvoice];

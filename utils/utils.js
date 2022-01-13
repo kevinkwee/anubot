@@ -2,10 +2,14 @@ let fetch;
 const crypto = require('crypto');
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
 const { Blob, FormData } = require('formdata-node');
+const { promisify } = require('node:util');
 
 import('node-fetch').then((module) => {
     fetch = module.default;
 });
+
+
+const wait = promisify(setTimeout);
 
 class MentionType {
     static U2 = 'U2';
@@ -153,6 +157,10 @@ function editMessage(guildId, channelId, messageId, content, embeds = []) {
 }
 
 function sendMessage(guildId, channelId, content, embeds = []) {
+    let processedContent = content.replace(/["]/g, String.raw`\"`);
+    processedContent = content.replace(/\n/g, "\\n");
+    // TODO: DELETE THIS LOG ATER ALL TEST IS PASSED
+    console.log(processedContent);
     return new Promise(async (resolve, reject) => {
         console.log("Sending message...");
         try {
@@ -173,7 +181,7 @@ function sendMessage(guildId, channelId, content, embeds = []) {
                     "Sec-Fetch-Site": "same-origin"
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
-                "body": '{\"content\":\"' + content + '\",\"tts\":false,\"embeds\":' + JSON.stringify(embeds) + '}',
+                "body": '{\"content\":\"' + processedContent + '\",\"tts\":false,\"embeds\":' + JSON.stringify(embeds) + '}',
                 "method": "POST",
                 "mode": "cors"
             });
@@ -329,7 +337,7 @@ function getRandomQuote() {
 }
 
 function isMsgMentioningUser(msgData, index = 2) {
-    const msgDataSplit = msgData.content.split(" ");
+    const msgDataSplit = msgData.content.splitByWhitespace();
     if (msgDataSplit.length >= (index + 1)) {
         if (!isMsgMentioningRole(msgData, index)
             && (msgDataSplit[index].startsWith("<@") && msgDataSplit[index].endsWith(">"))) {
@@ -340,7 +348,7 @@ function isMsgMentioningUser(msgData, index = 2) {
 }
 
 function isMsgMentioningRole(msgData, index = 2) {
-    const msgDataSplit = msgData.content.split(" ");
+    const msgDataSplit = msgData.content.splitByWhitespace();
     if (msgDataSplit.length >= (index + 1)) {
         if ((msgDataSplit[index].startsWith("<@&") && msgDataSplit[index].endsWith(">"))) {
             return true;
@@ -397,7 +405,7 @@ function handleMentioningMessage(
 }
 
 function getMentionedUserId(msgData, index = 2) {
-    const msgDataSplit = msgData.content.split(" ");
+    const msgDataSplit = msgData.content.splitByWhitespace();
     const mentionedUserId = msgDataSplit[index].slice(2, -1).replace(`!`, '');
     return mentionedUserId;
 }
@@ -529,7 +537,7 @@ function removeNonAscii(str) {
 }
 
 function capitalizeFirstLetterEachWord(str) {
-    const strSplit = str.split(" ");
+    const strSplit = str.splitByWhitespace();
     const newStrSplit = strSplit.map((value) => {
         return value.charAt(0).toUpperCase() + value.slice(1);
     });
@@ -545,6 +553,39 @@ function capitalizeFirstLetterEachWord(str) {
 
 function getUserAvatarUrl(id, avaHash, size = 512) {
     return `https://cdn.discordapp.com/avatars/${id}/${avaHash}.png?size=${size}`;
+}
+
+/**
+ * @param {number} seconds_num 
+ * @returns A string representing duration.
+ */
+function getDuration(seconds_num) {
+    let hours = Math.floor(seconds_num / 3600);
+    let minutes = Math.floor((seconds_num - hours * 3600) / 60);
+    let seconds = seconds_num - (hours * 3600) - (minutes * 60);
+    let hasHour = true;
+
+    if (hours == 0) {
+        hasHour = false;
+    }
+
+    if (hours < 10) {
+        hours = '0' + hours;
+    }
+
+    if (minutes < 10) {
+        minutes = '0' + minutes;
+    }
+
+    if (seconds < 10) {
+        seconds = '0' + seconds;
+    }
+
+    if (hasHour) {
+        return `${hours}:${minutes}:${seconds}`;
+    }
+
+    return `${minutes}:${seconds}`;
 }
 
 module.exports = {
@@ -572,5 +613,7 @@ module.exports = {
     buildXml: buildXml,
     removeNonAscii: removeNonAscii,
     getUserAvatarUrl: getUserAvatarUrl,
-    capitalizeFirstLetterEachWord: capitalizeFirstLetterEachWord
+    capitalizeFirstLetterEachWord: capitalizeFirstLetterEachWord,
+    getDuration,
+    wait
 }
