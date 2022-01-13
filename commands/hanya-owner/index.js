@@ -17,9 +17,6 @@ const { ref, set } = require('firebase/database');
 const utilsLoader = new ScriptLoader(__dirname + '/../../utils/utils.js');
 const utils = () => { return utilsLoader.script };
 
-const voiceLoader = new ScriptLoader(__dirname + '/../../voice/voice.js');
-const voice = () => { return voiceLoader.script };
-
 const addAdmin = new BotCommand(
     'addadmin',
     'Buat nambah admin',
