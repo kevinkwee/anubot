@@ -422,7 +422,7 @@ const antrean = new BotCommand(
                 fields[2].value = ':repeat_one: Satu lagu';
                 break;
             case LoopMode.QUEUE:
-                fields[2].value = ':repeat: Satu lagu';
+                fields[2].value = ':repeat: Antrean';
                 break;
             default:
                 fields[2].value = ':regional_indicator_x: Mati';
