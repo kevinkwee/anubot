@@ -60,7 +60,27 @@ function connect(isResuming = false) {
         if (isResuming) {
             resumeSession(ws);
         } else {
-            ws.send(process.env.IDENTIFY_PAYLOAD);
+            const identifyPayload = {
+                op: 2,
+                d: {
+                    token: process.env.TOKEN,
+                    properties: {
+                        $os: 'anu',
+                        $browser: 'anu',
+                        $device: 'anu'
+                    },
+                    presence: {
+                        activities: [{
+                            name: 'anu help',
+                            type: 2
+                        }],
+                        status: 'online',
+                        afk: false
+                    },
+                    intents: 32767
+                }
+            };
+            ws.send(JSON.stringify(identifyPayload));
         }
     });
 
