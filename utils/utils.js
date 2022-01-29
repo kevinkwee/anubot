@@ -184,8 +184,7 @@ function sendImage(guildId, channelId, blob, filename) {
                 "credentials": "include",
                 "headers": {
                     "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
-                    "Content-Type": "application/json",
-                    "Authorization": 'Bot ' + process.env.TOKEN,
+                    "Authorization": 'Bot ' + process.env.TOKEN
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "body": formData,

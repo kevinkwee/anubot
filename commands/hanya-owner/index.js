@@ -29,6 +29,7 @@ const addAdmin = new BotCommand(
 
         const guildId = msgData.guild_id;
         const channelId = msgData.channel_id;
+        const msgAuthorId = msgData.author.id;
         const msgDataSplit = msgData.content.splitByWhitespace();
 
         const isPrivilegedUser = utils().isPrivilegedUser(getOwnerList(), [], msgAuthorId);
