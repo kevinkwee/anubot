@@ -120,7 +120,6 @@ const help = new BotCommand(
 
         console.log();
         console.log("[Command detected] [anu help]");
-        console.log(embeds);
         utils().sendMessage(guildId, channelId, "", [embeds]);
     }
 );

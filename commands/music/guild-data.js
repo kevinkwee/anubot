@@ -92,6 +92,8 @@ function trackUserVoiceChannel(guildId, channelId, userId) {
         return;
     }
 
+    if (!botCurrentVoiceChannelId) return;
+
     lockGuildVoiceStates();
     const oldUserVoiceChannelId = getUserCurrentVoiceChannelId(guildId, userId);
     const newUserVoiceChannelId = channelId;

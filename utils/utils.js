@@ -32,16 +32,9 @@ function editServerNick(guildId, nick) {
             const response = await fetch("https://discord.com/api/v9/guilds/" + guildId + "/members/@me", {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Authorization": 'Bot ' + process.env.TOKEN,
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
                     "Content-Type": "application/json",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin"
+                    "Authorization": 'Bot ' + process.env.TOKEN,
                 },
                 "body": "{\"nick\":\"" + nick + "\"}",
                 "method": "PATCH",
@@ -73,15 +66,9 @@ function deleteMessage(guildId, channelId, messageId) {
             const response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages/" + messageId, {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
+                    "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin"
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "method": "DELETE",
@@ -115,16 +102,9 @@ function editMessage(guildId, channelId, messageId, content, embeds = []) {
             const response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages/" + messageId, {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
                     "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin"
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "body": "{\"content\":\"" + content + "\",\"embeds\":" + JSON.stringify(embeds) + "}",
@@ -162,22 +142,12 @@ function sendMessage(guildId, channelId, content, embeds = []) {
             let response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages", {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
                     "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Alt-Used": "discord.com",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin"
                 },
-                "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "body": '{\"content\":\"' + processedContent + '\",\"tts\":false,\"embeds\":' + JSON.stringify(embeds) + '}',
-                "method": "POST",
-                "mode": "cors"
+                "method": "POST"
             });
 
             if (response.status == 200) {
@@ -189,6 +159,7 @@ function sendMessage(guildId, channelId, content, embeds = []) {
                 });
             } else {
                 console.log("Failed to send a message. " + response.status);
+                console.log("JSON Data. " + response.statusText);
                 // reject({
                 //     status: response.status,
                 //     data: null,
@@ -212,16 +183,9 @@ function sendImage(guildId, channelId, blob, filename) {
             let response = await fetch("https://discord.com/api/v9/channels/" + channelId + "/messages", {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
+                    "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Alt-Used": "discord.com",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "cors",
-                    "Sec-Fetch-Site": "same-origin"
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "body": formData,
@@ -252,18 +216,9 @@ function joinThread(guildId, channelId, threadId) {
             const response = await fetch("https://discord.com/api/v9/channels/" + threadId + "/thread-members/@me?location=Context%20Menu", {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
+                    "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4OTI0LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "no-cors",
-                    "Sec-Fetch-Site": "same-origin",
-                    "Pragma": "no-cache",
-                    "Cache-Control": "no-cache"
                 },
                 "referrer": "https://discord.com/channels/" + guildId + "/" + channelId,
                 "method": "POST",
@@ -410,19 +365,9 @@ function getUser(id) {
             const response = await fetch("https://discord.com/api/v9/users/" + id, {
                 "credentials": "include",
                 "headers": {
-                    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:93.0) Gecko/20100101 Firefox/93.0",
-                    "Accept": "*/*",
-                    "Accept-Language": "en-US,en;q=0.5",
+                    "User-Agent": "DiscordBot (https://github.com/luckylazy/anubot.git, 0.1.0)",
+                    "Content-Type": "application/json",
                     "Authorization": 'Bot ' + process.env.TOKEN,
-                    "X-Super-Properties": "eyJvcyI6IkxpbnV4IiwiYnJvd3NlciI6IkZpcmVmb3giLCJkZXZpY2UiOiIiLCJzeXN0ZW1fbG9jYWxlIjoiZW4tVVMiLCJicm93c2VyX3VzZXJfYWdlbnQiOiJNb3ppbGxhLzUuMCAoWDExOyBVYnVudHU7IExpbnV4IHg4Nl82NDsgcnY6OTMuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC85My4wIiwiYnJvd3Nlcl92ZXJzaW9uIjoiOTMuMCIsIm9zX3ZlcnNpb24iOiIiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTA4OTI0LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ==",
-                    "X-Discord-Locale": "en-US",
-                    "X-Debug-Options": "bugReporterEnabled",
-                    "Alt-Used": "discord.com",
-                    "Sec-Fetch-Dest": "empty",
-                    "Sec-Fetch-Mode": "no-cors",
-                    "Sec-Fetch-Site": "same-origin",
-                    "Pragma": "no-cache",
-                    "Cache-Control": "no-cache"
                 },
                 "method": "GET",
                 "mode": "cors"

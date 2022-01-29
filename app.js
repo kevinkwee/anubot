@@ -77,7 +77,7 @@ function connect(isResuming = false) {
                         status: 'online',
                         afk: false
                     },
-                    intents: 32767
+                    intents: 14023
                 }
             };
             ws.send(JSON.stringify(identifyPayload));
@@ -121,7 +121,6 @@ function connect(isResuming = false) {
             case 10:
                 const { heartbeat_interval } = d;
                 interval = heartbeat(heartbeat_interval, ws);
-                // utils().editServerNick(process.env.JEJE_GUILD_ID, process.env.ONLINE_NICK);
                 break;
             case 11:
                 heartbeatAck = true;
@@ -142,20 +141,26 @@ function handleEvent(t, s, op, d, ws) {
         case 'READY':
             sessionId = d.session_id;
             break;
-        case 'READY_SUPPLEMENTAL':
-            d.guilds.forEach((guild) => {
-                guild.voice_states.forEach((voiceState) => {
-                    updateMusicGuildData(guild.id, voiceState.channel_id, voiceState.user_id);
-                    leaveVoiceChannelIfAlone(guild.id);
-                });
-            });
-            break;
+        // case 'READY_SUPPLEMENTAL':
+        //     d.guilds.forEach((guild) => {
+        //         guild.voice_states.forEach((voiceState) => {
+        //             updateMusicGuildData(guild.id, voiceState.channel_id, voiceState.user_id);
+        //             leaveVoiceChannelIfAlone(guild.id);
+        //         });
+        //     });
+        //     break;
         case 'VOICE_STATE_UPDATE':
             updateMusicGuildData(d.guild_id, d.channel_id, d.user_id);
             leaveVoiceChannelIfAlone(d.guild_id);
             break;
         case 'MESSAGE_CREATE':
             commandHandler().handle(d, ws);
+            break;
+        case 'GUILD_CREATE':
+            d.voice_states.forEach((voiceState) => {
+                updateMusicGuildData(d.id, voiceState.channel_id, voiceState.user_id);
+                leaveVoiceChannelIfAlone(d.id);
+            });
             break;
         default:
             break;
