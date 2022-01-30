@@ -1,7 +1,12 @@
 {
     "cookie": {
-        "GPS": "1",
-        "YSC": "DCjS6M2XNLw",
-        "VISITOR_INFO1_LIVE": "0dOh3UZYuZI"
+        "SID": "GgiNvWYvIsbEemnWJiOcntjD0GlarHNONe6owlCEYld4Zk6YNhy4BqY8kzkm6P9kVJAZOw.",
+        "APISID": "tBC_PyUolB2YSrrA/AemuLefiWiuvs22dp",
+        "SAPISID": "GXV3ydUB-UzjIuip/AFbkt7t3k-cyYUWer",
+        "__Secure-1PAPISID": "GXV3ydUB-UzjIuip/AFbkt7t3k-cyYUWer",
+        "__Secure-3PAPISID": "GXV3ydUB-UzjIuip/AFbkt7t3k-cyYUWer",
+        "SIDCC": "AJi4QfGmSsTDttQ7z_rahNNKyeYDdQcnN4XoZHvi97oBpnYFNLAcwBzPsHbM-LYrW4FswO3ufQ",
+        "PREF": "tz=Asia.Jakarta&f6=40000000",
+        "CONSISTENCY": "AGDxDeP3GWUamcODQ9_YNyT1AZLZzWyzf99ne8I3KqXiJDSV6mDsJJ65mFOrocSvLXCZKRh-sRgS5u6WnTvj667KyXGDiDBAW_Xbbf-gu_voG1N3XntPHBsQdcAhnPfnd4l1va4154jQRY9XCd0j_vrdFp_tYZJnRgmMod92hQw6bqkpwy_7xSiMM4l78X5khR58P77h7JLm9jS5bTZwN5P7Aw"
     }
 }
