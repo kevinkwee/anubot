@@ -58,6 +58,8 @@ class MusicPlayer {
         this.boundTextChannelId = boundTextChannelId;
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
+            console.log(`OLD VOICE STATE: ${_}`);
+            console.log(`NEW VOICE STATE: ${newState}`);
             if (newState.status == VoiceConnectionStatus.Disconnected) {
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     try {
@@ -66,9 +68,11 @@ class MusicPlayer {
                         this.voiceConnection.destroy();
                     }
                 } else if (this.voiceConnection.rejoinAttempts < 5) {
+                    console.log('TRYING TO REJOIN VOICE CHANNEL');
                     await wait((this.voiceConnection.rejoinAttempts + 1) * 5e3);
                     this.voiceConnection.rejoin();
                 } else {
+                    console.log('FAILED TO REJOIN, DESTROYING');
                     this.voiceConnection.destroy();
                 }
             } else if (newState.status == VoiceConnectionStatus.Destroyed) {

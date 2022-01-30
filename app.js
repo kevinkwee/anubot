@@ -103,8 +103,8 @@ function connect(isResuming = false) {
         switch (op) {
             case 0:
                 sequence = s;
-                console.log();
-                console.log(`[${utils().getCurrentTimeStr()}] [EVENT] ${t}`);
+                // console.log();
+                // console.log(`[${utils().getCurrentTimeStr()}] [EVENT] ${t}`);
                 handleEvent(t, s, op, d, ws);
                 break;
             case 7:
