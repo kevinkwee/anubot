@@ -84,14 +84,12 @@ function connect(isResuming = false) {
         }
     });
 
-    ws.on('close', (_, code, reason) => {
+    ws.on('close', () => {
         clearInterval(interval);
         heartbeatAck = false;
         zombieHeartbeatCount = 0;
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Websocket closed.");
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Bye bye...");
-        console.log(`Closed code: ${code}`);
-        console.log(`Reason: ${reason.toString()}`);
     });
 
     ws.on('message', (data) => {
