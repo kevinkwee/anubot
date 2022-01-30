@@ -62,7 +62,7 @@ class MusicPlayer {
             console.log(`OLD VOICE STATE: ${_.status}`);
             console.log(`NEW VOICE STATE: ${newState.status}`);
             if (newState.status == VoiceConnectionStatus.Disconnected) {
-                console.log(`REASON: ${newState.reason}; CODE: ${newState.closeCode}`);
+                console.log(`CLOSE CODE: ${newState.closeCode}`);
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     try {
                         await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, 5e3);
