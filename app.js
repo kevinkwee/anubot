@@ -84,12 +84,17 @@ function connect(isResuming = false) {
         }
     });
 
-    ws.on('close', () => {
+    ws.on('close', (_, code) => {
         clearInterval(interval);
         heartbeatAck = false;
         zombieHeartbeatCount = 0;
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Websocket closed.");
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Bye bye...");
+        if (code != 7 && code != 9 && code != 99) {
+            console.log();
+            console.log("[" + utils().getCurrentTimeStr() + "] " + "NEW CONNECTION");
+            connect();
+        }
     });
 
     ws.on('message', (data) => {
@@ -107,14 +112,14 @@ function connect(isResuming = false) {
                 break;
             case 7:
                 console.log(`[${utils().getCurrentTimeStr()}] SHOULD RECONNECT`);
-                ws.close();
+                ws.close(7);
                 setTimeout(() => {
                     connect(true);
                 }, 1000);
                 break;
             case 9:
                 console.log(`[${utils().getCurrentTimeStr()}] INVALID SESSION`);
-                ws.close();
+                ws.close(9);
                 exit(0);
             case 10:
                 const { heartbeat_interval } = d;
@@ -192,7 +197,7 @@ function leaveVoiceChannelIfAlone(guildId) {
 function heartbeat(h, ws) {
     if (zombieHeartbeatCount == 3) {
         console.log(`[${utils().getCurrentTimeStr()}] ZOMBIED CONNECTION`);
-        ws.close();
+        ws.close(99);
         connect(true);
         return;
     }

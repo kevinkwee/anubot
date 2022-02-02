@@ -400,6 +400,11 @@ const antrean = new BotCommand(
                 "inline": false
             },
             {
+                "name": "Durasi total",
+                "value": ``,
+                "inline": false
+            },
+            {
                 "name": "Mode acak",
                 "value": ``,
                 "inline": true
@@ -411,21 +416,29 @@ const antrean = new BotCommand(
             }
         ];
 
+        let durationInSec = 0;
+
+        guildMusicPlayer.queue.forEach((track) => {
+            durationInSec += track.durationInSec;
+        });
+
+        fields[1].value = `\`${utils.getDuration(durationInSec)}\``;
+
         if (guildMusicPlayer.shuffleMode == ShuffleMode.ON) {
-            fields[1].value = ':twisted_rightwards_arrows: Hidup';
+            fields[2].value = ':twisted_rightwards_arrows: Hidup';
         } else {
-            fields[1].value = ':regional_indicator_x: Mati';
+            fields[2].value = ':regional_indicator_x: Mati';
         }
 
         switch (guildMusicPlayer.loopMode) {
             case LoopMode.TRACK:
-                fields[2].value = ':repeat_one: Satu lagu';
+                fields[3].value = ':repeat_one: Satu lagu';
                 break;
             case LoopMode.QUEUE:
-                fields[2].value = ':repeat: Antrean';
+                fields[3].value = ':repeat: Antrean';
                 break;
             default:
-                fields[2].value = ':regional_indicator_x: Mati';
+                fields[3].value = ':regional_indicator_x: Mati';
                 break;
         }
 
@@ -447,7 +460,6 @@ const antrean = new BotCommand(
                     }
                 }
             ];
-            console.log(embeds);
             utils.sendMessage(guildId, channelId, '', embeds);
             return;
         }
@@ -493,7 +505,7 @@ const antrean = new BotCommand(
 const ulang = new BotCommand(
     'ulang',
     'Buat ngulang-ngulang lagu atau playlist',
-    process.env.CMD_PREFIX + ' ulang [mati/off/lagu/song/track/t/one/antrean/playlist/all/queue/q]',
+    process.env.CMD_PREFIX + ' ulang [mati/off/lagu/song/track/t/one/a/antrean/playlist/all/queue/q]',
     ['u', 'loop', 'repeat', 'r'],
     CommandCategories.music,
     (msgData) => {
@@ -518,6 +530,7 @@ const ulang = new BotCommand(
             case 'antrean':
             case 'playlist':
             case 'all':
+            case 'a':
             case 'queue':
             case 'q':
                 guildMusicPlayer.loopQueue(guildId, channelId);
@@ -533,10 +546,10 @@ const ulang = new BotCommand(
     }
 );
 
-const hapus = new BotCommand(
-    'hapus',
-    'Buat hapus semua kenangan masa lalumu... Ehh, ngga, mksdnya semua antrean lagu. xixi :sweat_smile:',
-    process.env.CMD_PREFIX + ' hapus',
+const bersihkan = new BotCommand(
+    'bersihkan',
+    'Buat hapus semua kenangan masa lalumu... Ehh, ngga, mksdnya semua antrean lagu. xixixi',
+    process.env.CMD_PREFIX + ' bersihkan',
     ['clear', 'reset'],
     CommandCategories.music,
     (msgData) => {
@@ -623,7 +636,7 @@ const barudiputar = new BotCommand(
                 "fields": [
                     {
                         "name": "Durasi",
-                        "value": `\`${utils.getDuration(audioResourceMetadata.durationInSec)}\``,
+                        "value": `\`${utils.getDuration(Math.floor(guildMusicPlayer.audioPlayer.state.resource.playbackDuration / 1e3))}/${utils.getDuration(audioResourceMetadata.durationInSec)}\``,
                         "inline": true
                     },
                     {
@@ -643,7 +656,36 @@ const barudiputar = new BotCommand(
     }
 );
 
-module.exports = [gabung, pergi, putar, skip, antrean, ulang, hapus, acak, barudiputar];
+const hapus = new BotCommand(
+    'hapus',
+    'Buat hapus lagu yang km mau.',
+    process.env.CMD_PREFIX + ' hapus <nomor lagu di antrean>',
+    ['remove', 'delete', 'rm', 'del'],
+    CommandCategories.music,
+    (msgData, ws) => {
+        console.log();
+        console.log("[Command detected] [anu hapus]");
+
+        const guildId = msgData.guild_id;
+        const channelId = msgData.channel_id;
+        const msgContentSplit = msgData.content.splitByWhitespace();
+        const guildMusicPlayer = isTheBotCurrentlyOnAVoiceChannel(guildId, channelId, { msgIfFalse: MusicMessage.PFT });
+
+        if (!guildMusicPlayer) return;
+        if (!isTheUserCurrentlyOnTheSameVoiceChannel(guildId, channelId, msgData.author.id)) return;
+
+        const selectedTrackNum = parseInt(msgContentSplit[2]);
+
+        if (msgContentSplit.length < 3 || isNaN(selectedTrackNum)) {
+            utils.sendMessage(guildId, channelId, '> *Kasih nomor lagu yang mau dihapus ya mz, ku tak bisa membaca pikiranmu.*');
+            return;
+        }
+
+        guildMusicPlayer.remove(selectedTrackNum - 1, guildId, channelId);
+    }
+);
+
+module.exports = [gabung, pergi, putar, skip, antrean, ulang, bersihkan, acak, barudiputar, hapus];
 
 /**
  * join V

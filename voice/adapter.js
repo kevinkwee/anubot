@@ -11,7 +11,6 @@ const trackClientCallback = (data) => {
                 break;
             case 'VOICE_STATE_UPDATE':
                 if (d.guild_id && d.session_id && d.user_id == process.env.BOT_ID) {
-                    console.log(d);
                     adapter?.onVoiceStateUpdate(d);
                 }
                 break;

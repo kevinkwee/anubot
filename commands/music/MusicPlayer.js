@@ -58,11 +58,7 @@ class MusicPlayer {
         this.boundTextChannelId = boundTextChannelId;
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
-            console.log();
-            console.log(`OLD VOICE STATE: ${_.status}`);
-            console.log(`NEW VOICE STATE: ${newState.status}`);
             if (newState.status == VoiceConnectionStatus.Disconnected) {
-                console.log(`REASON: ${newState.reason}; CODE: ${newState.closeCode}`);
                 if (newState.reason == VoiceConnectionDisconnectReason.WebSocketClose && newState.closeCode == 4014) {
                     try {
                         await entersState(this.voiceConnection, VoiceConnectionStatus.Connecting, 5e3);
@@ -70,18 +66,12 @@ class MusicPlayer {
                         this.voiceConnection.destroy();
                     }
                 } else if (this.voiceConnection.rejoinAttempts < 5) {
-                    console.log();
-                    console.log('TRYING TO REJOIN VOICE CHANNEL');
                     await wait((this.voiceConnection.rejoinAttempts + 1) * 5e3);
                     this.voiceConnection.rejoin();
                 } else {
-                    console.log();
-                    console.log('FAILED TO REJOIN, DESTROYING');
                     this.voiceConnection.destroy();
                 }
             } else if (newState.status == VoiceConnectionStatus.Destroyed) {
-                console.log();
-                console.log('************DESTROYED************');
                 this.stop();
                 setGuildMusicPlayer(this.boundGuildId, null);
             } else if (
@@ -488,7 +478,7 @@ class MusicPlayer {
         const embeds = [
             {
                 "color": 10717951,
-                "description": `:twisted_rightwards_arrows: Ok mz, urutan lagunya kuacak-acak ya. Tapi jangan acak2 hidup ya xixi. :hugging:`,
+                "description": `:twisted_rightwards_arrows: Ok mz, urutan lagunya kuacak-acak ya.`,
                 "timestamp": (new Date()).toISOString(),
             }
         ];
@@ -516,6 +506,50 @@ class MusicPlayer {
             }
         ];
         utils.sendMessage(guildId, channelId, '', embeds);
+    }
+
+    remove(index, guildId, channelId) {
+        if (this.queueLock) {
+            // Wrap recursive bcoz of max stack call size.
+            setImmediate(() => {
+                this.remove(index, guildId, channelId);
+            });
+            return;
+        }
+
+        this.lockQueue();
+
+        let embeds;
+
+        if (index > (this.queue.length - 1) || index < 0) {
+            embeds = [
+                {
+                    "color": 16711680,
+                    "description": `:x: Ngga ada lagu nomor \`${index + 1}\` mz.`,
+                    "timestamp": (new Date()).toISOString(),
+                }
+            ];
+        } else {
+            let deletedTrack;
+            this.queue = this.queue.filter((value, i) => {
+                if (index != i) {
+                    return value;
+                } else {
+                    deletedTrack = value;
+                }
+            });
+            embeds = [
+                {
+                    "color": 10717951,
+                    "description": `:wastebasket: Lagu \`${deletedTrack.title}\` udah kuhapus ya mz.`,
+                    "timestamp": (new Date()).toISOString(),
+                }
+            ];
+        }
+
+        utils.sendMessage(guildId, channelId, '', embeds);
+
+        this.unlockQueue();
     }
 
     /**
