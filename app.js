@@ -46,7 +46,7 @@ let sessionId;
 
 let heartbeatAck = false;
 let zombieHeartbeatCount = 0;
-
+let isForceClosed = false;
 
 const url = "wss://gateway.discord.gg/?encoding=json&v=9";
 
@@ -90,7 +90,7 @@ function connect(isResuming = false) {
         zombieHeartbeatCount = 0;
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Websocket closed.");
         console.log("[" + utils().getCurrentTimeStr() + "] " + "Bye bye...");
-        if (code != 7 && code != 9 && code != 99) {
+        if (!isForceClosed) {
             console.log();
             console.log("[" + utils().getCurrentTimeStr() + "] " + "NEW CONNECTION");
             connect();
@@ -112,14 +112,16 @@ function connect(isResuming = false) {
                 break;
             case 7:
                 console.log(`[${utils().getCurrentTimeStr()}] SHOULD RECONNECT`);
-                ws.close(7);
+                ws.close();
+                isForceClosed = true;
                 setTimeout(() => {
                     connect(true);
                 }, 1000);
                 break;
             case 9:
                 console.log(`[${utils().getCurrentTimeStr()}] INVALID SESSION`);
-                ws.close(9);
+                ws.close();
+                isForceClosed = true;
                 exit(0);
             case 10:
                 const { heartbeat_interval } = d;
@@ -197,7 +199,8 @@ function leaveVoiceChannelIfAlone(guildId) {
 function heartbeat(h, ws) {
     if (zombieHeartbeatCount == 3) {
         console.log(`[${utils().getCurrentTimeStr()}] ZOMBIED CONNECTION`);
-        ws.close(99);
+        ws.close();
+        isForceClosed = true;
         connect(true);
         return;
     }
